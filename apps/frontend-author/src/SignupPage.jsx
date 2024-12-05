@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { apiUrl } from "./utils.js";
+import { apiUrl, sendFormRequest } from "./utils.js";
 
 export default function SignupPage() {
   const [errors, setErrors] = useState([]);
@@ -9,15 +9,8 @@ export default function SignupPage() {
   async function handleSubmit(e) {
     e.preventDefault();
 
-    const formData = new FormData(e.target);
-    const payload = Object.fromEntries(formData.entries());
-    const request = await fetch(`${apiUrl}/users`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    const response = await sendFormRequest(e.target, "/users").json();
 
-    const response = await request.json();
     if (Array.isArray(response)) {
       setSuccess(false);
       return setErrors([...response]);

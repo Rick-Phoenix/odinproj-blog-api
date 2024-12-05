@@ -37,7 +37,7 @@ export default [
         { allowConstantExport: true },
       ],
       "react/prop-types": 0,
-      "no-unused-vars": "warn",
+      "no-unused-vars": 0,
       "react-compiler/react-compiler": "warn",
     },
   },

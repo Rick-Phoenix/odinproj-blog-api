@@ -92,3 +92,8 @@ img {
   gap: 2rem;
   justify-content: center;
 }
+
+#editor {
+  height: 250px;
+  width: 250px;
+}

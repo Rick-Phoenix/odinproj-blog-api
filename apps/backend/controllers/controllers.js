@@ -1,6 +1,8 @@
 import { body, validationResult } from "express-validator";
 import { checkPassword, genPassword } from "../auth/passwordUtils.js";
-import { getUser } from "../prisma/queries.js";
+import { createPost, getUser } from "../prisma/queries.js";
+import jwt from "jsonwebtoken";
+const secretKey = process.env.JWT_SECRET;
 
 export const signUpValidationChain = [
   body("username")
@@ -51,7 +53,7 @@ export const signUpValidationChain = [
       return res.status(400).json(errors.array());
     }
 
-    res.status(200);
+    res.status(200).json("User registered correctly.");
   },
 ];
 
@@ -62,5 +64,47 @@ export async function validateLogin(req, res) {
   const { hash, salt } = user;
   const pwCheck = checkPassword(password, hash, salt);
   if (!pwCheck) return res.status(400).json("Incorrect password.");
-  res.json(user);
+  jwt.sign(
+    { userId: user.id, username, admin: user.isAuthor },
+    secretKey,
+    { expiresIn: "2h" },
+    (err, token) => {
+      res.json({
+        token,
+        admin: user.isAuthor,
+      });
+    }
+  );
+}
+
+export function checkAuthorization(req, res, next) {
+  const token = req.header("Authorization")?.split(" ")[1];
+
+  if (!token) {
+    return res
+      .status(403)
+      .json({ message: "Access denied, no token provided." });
+  }
+
+  jwt.verify(token, secretKey, (err, decodedToken) => {
+    if (err) {
+      return res.status(401).json({ message: "Invalid or expired token." });
+    }
+
+    req.user = decodedToken;
+    next();
+  });
+}
+
+export function checkAdmin(req, res, next) {
+  if (!req.user.admin) {
+    return res.status(403);
+  }
+  next();
+}
+
+export function submitPost(req, res) {
+  const { text, title, published } = req.body;
+  createPost(title, text, published);
+  res.status(200).json("Post submitted succesfully.");
 }
