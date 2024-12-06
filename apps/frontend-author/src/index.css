@@ -101,6 +101,13 @@ img {
 .postsGallery {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 200px;
+
+  li {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
 }
 
 .commentsList {
