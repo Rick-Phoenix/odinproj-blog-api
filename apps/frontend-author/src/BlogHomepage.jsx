@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 export default function BlogHomepage() {
   const navigate = useNavigate();
-  const userData = useFetch("/blog");
+  const user = useFetch("/blog");
   const posts = useFetch("/blog/posts");
 
   function handleLogout() {
@@ -11,9 +11,11 @@ export default function BlogHomepage() {
     navigate("/");
   }
 
+  if (!user) return <h1>Loading...</h1>;
+
   return (
     <>
-      <h1>Home sweet home</h1>
+      <h1>Home sweet home, {user.username}</h1>
       <div className="buttons">
         <button type="button" onClick={handleLogout}>
           Log Out
@@ -24,7 +26,7 @@ export default function BlogHomepage() {
       </div>
 
       {posts !== null ? (
-        <ul>
+        <ul className="postsGallery">
           {posts.map((post) => {
             return (
               <li key={post.id}>

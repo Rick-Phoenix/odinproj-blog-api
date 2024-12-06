@@ -48,6 +48,20 @@ export async function getSinglePost(id) {
     where: {
       id,
     },
+    include: {
+      comments: {
+        orderBy: {
+          publishedAt: "asc",
+        },
+        include: {
+          user: {
+            select: {
+              username: true,
+            },
+          },
+        },
+      },
+    },
   });
 
   return post;
@@ -73,4 +87,45 @@ export async function updatePost(id, title, text, published) {
       published,
     },
   });
+}
+
+export async function createComment(text, postId, userId) {
+  const comment = await prisma.comment.create({
+    data: {
+      text,
+      postId,
+      userId,
+    },
+    include: {
+      user: {
+        select: {
+          username: true,
+        },
+      },
+    },
+  });
+
+  return comment;
+}
+
+export async function deleteComment(id) {
+  await prisma.comment.delete({
+    where: {
+      id,
+    },
+  });
+}
+
+export async function updateComment(id, text) {
+  const comment = await prisma.comment.update({
+    where: {
+      id,
+    },
+
+    data: {
+      text,
+    },
+  });
+
+  return comment;
 }

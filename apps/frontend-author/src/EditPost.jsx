@@ -20,8 +20,6 @@ export default function EditPost() {
       published: bool,
     };
 
-    console.log(formObj);
-
     const headers = { "Content-Type": "application/json" };
     const token = localStorage.getItem("JWT");
     if (token) {

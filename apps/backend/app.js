@@ -10,9 +10,12 @@ import {
   submitPost,
 } from "./controllers/controllers.js";
 import {
+  createComment,
+  deleteComment,
   deletePost,
   getPosts,
   getSinglePost,
+  updateComment,
   updatePost,
 } from "./prisma/queries.js";
 
@@ -31,6 +34,14 @@ app.use("/blog/admin", checkAdmin);
 
 app.post("/users", signUpValidationChain);
 app.post("/login", validateLogin);
+app.post("/blog/admin/posts", submitPost);
+app.post("/blog/posts/:postId/comments", async (req, res) => {
+  const { postId } = req.params;
+  const { text, userId } = req.body;
+
+  const comment = await createComment(text, +postId, +userId);
+  res.json(comment);
+});
 
 app.get("/blog", (req, res) => {
   res.json(req.user);
@@ -46,15 +57,27 @@ app.get("/blog/posts/:postId", async (req, res) => {
   res.json(post);
 });
 
-app.post("/blog/admin/posts", submitPost);
 app.delete("/blog/admin/posts/:postId", async (req, res) => {
   const post = deletePost(+req.params.postId);
   res.json(post);
 });
+
+app.delete("/blog/posts/:postId/comments/:commentId", async (req, res) => {
+  const comment = deleteComment(+req.params.commentId);
+  res.json(comment);
+});
+
 app.put("/blog/admin/posts/:postId", async (req, res) => {
   const { title, text, published } = req.body;
   const post = updatePost(+req.params.postId, title, text, published);
   res.json(post);
+});
+
+app.put("/blog/posts/:postId/comments/:commentId", async (req, res) => {
+  const { text } = req.body;
+  const comment = updateComment(+req.params.commentId, text);
+
+  res.json(comment);
 });
 
 app.listen(3000);
