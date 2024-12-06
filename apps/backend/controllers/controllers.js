@@ -1,6 +1,6 @@
 import { body, validationResult } from "express-validator";
 import { checkPassword, genPassword } from "../auth/passwordUtils.js";
-import { createPost, getUser } from "../prisma/queries.js";
+import { createPost, createUser, getUser } from "../prisma/queries.js";
 import jwt from "jsonwebtoken";
 const secretKey = process.env.JWT_SECRET;
 
@@ -53,6 +53,9 @@ export const signUpValidationChain = [
       return res.status(400).json(errors.array());
     }
 
+    const { username, email, password } = req.body;
+    const { hash, salt } = genPassword(password);
+    createUser(username, email, hash, salt);
     res.status(200).json("User registered correctly.");
   },
 ];

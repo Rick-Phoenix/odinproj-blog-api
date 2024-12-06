@@ -9,7 +9,9 @@ export default function SignupPage() {
   async function handleSubmit(e) {
     e.preventDefault();
 
-    const response = await sendFormRequest(e.target, "/users").json();
+    const request = await sendFormRequest(e.target, "/users");
+
+    const response = await request.json();
 
     if (Array.isArray(response)) {
       setSuccess(false);
